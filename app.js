@@ -5,6 +5,7 @@ import morgan from "morgan";
 import { fileURLToPath } from "url";
 
 import router from "./routes/index.js";
+import logger from "./logging.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,7 +14,6 @@ const port = process.env.PORT ?? 3000;
 
 // MARK: configure database
 import "./database/connection.js";
-
 
 // MARK: configure app
 const app = express();
@@ -26,6 +26,8 @@ app.use(express.static(path.join(__dirname, "public")));
 // MARK: configure routes
 app.use("/", router);
 
+// MARK: start server
 app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+    // console.log(`Server running on port ${port}`);
+    logger.info(`Server running on port ${port}`);
 });
