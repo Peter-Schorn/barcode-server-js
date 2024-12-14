@@ -1,0 +1,64 @@
+// Visit https://aka.ms/tsconfig to read more about this file
+// https://www.totaltypescript.com/tsconfig-cheat-sheet
+{
+    "compilerOptions": {
+        
+        // Set the JavaScript language version for emitted JavaScript and
+        // include compatible library declarations.
+        "target": "ES2022",
+        
+        // Specify what module code is generated.
+        "module": "NodeNext",
+        
+        // Emit additional JavaScript to ease support for importing CommonJS 
+        // modules. This enables 'allowSyntheticDefaultImports' for type 
+        // compatibility.
+        "esModuleInterop": true,
+        
+        // Do not transform or elide any imports or exports not marked as 
+        // type-only, ensuring they are written in the output file's format 
+        // based on the 'module' setting.
+        "verbatimModuleSyntax": true,
+        
+        // Specify a set of bundled library declaration files that describe the 
+        // target runtime environment.
+        "lib": [
+            "es2022"
+        ],
+
+        "allowJs": true,
+        "checkJs": true,
+        
+        // Ensure that casing is correct in imports.
+        "forceConsistentCasingInFileNames": true,
+        
+        // Enable all strict type-checking options.
+        "strict": true,
+        
+        // Ensure overriding members in derived classes are marked with an 
+        // override modifier.
+        "noImplicitOverride": true,
+        
+        // Report errors on unused local variables.
+        "noUnusedLocals": true,
+        
+        // Report errors on unused parameters in functions.
+        // "noUnusedParameters": true,
+
+        // Report errors for fallthrough cases in switch statements.
+        "noFallthroughCasesInSwitch": true,
+        
+        // Specify the root directory of input files.
+        "rootDir": "src",
+        
+        // Specify an output folder for all emitted files.
+        "outDir": "dist",
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "dist",
+        "node_modules"
+    ]
+}

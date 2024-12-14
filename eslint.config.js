@@ -1,11 +1,32 @@
 import globals from "globals";
-import pluginJs from "@eslint/js";
+import eslint from "@eslint/js";
+import tseslint from "typescript-eslint";
 
-
-/** @type {import('eslint').Linter.Config[]} */
-export default [
+export default tseslint.config(
     {
+        ignores: [
+            "dist/"
+        ],
+    },
+    {
+        plugins: {
+            "@typescript-eslint": tseslint.plugin
+        },
         languageOptions: {
+            parser: tseslint.parser,
+            parserOptions: {
+                ecmaVersion: 2022,
+                sourceType: "module",
+                project: [
+                    "./tsconfig.json",
+                    // necessary for linting the eslint.config.js file itself 
+                    // because eslint uses the "compilerOptions.include" key of 
+                    // the tsconfig to determine which files to lint, but if we 
+                    // put eslint.config.js in the tsconfig.json then typescript
+                    // would try to compile it
+                    "./tsconfig.eslint.json"
+                ]
+            },
             globals: globals.node,
             ecmaVersion: "latest",
             sourceType: "module",
@@ -20,6 +41,8 @@ export default [
                 argsIgnorePattern: "^_+$",
             }],
         },
+        
     },
-    pluginJs.configs.recommended,
-];
+    eslint.configs.recommended,
+    tseslint.configs.recommended
+);

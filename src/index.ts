@@ -1,9 +1,8 @@
 import "dotenv/config";
 import app from "./app.js";
-import logger from "./logging.js";
+import logger from "./logging/logger.js";
 
 const port = process.env.PORT ?? 3000;
-// MARK: start server
 app.listen(port, () => {
     
     console.log(`LOG_LEVEL: ${process.env.LOG_LEVEL}`);
