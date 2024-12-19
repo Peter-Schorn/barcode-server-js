@@ -1,4 +1,5 @@
 import pgPromise from "pg-promise";
+import { sqlLogger } from "../logging/loggers.js";
 
 const connectionURI = process.env.BARCODE_DROP_DATABASE_CONNECTION_URI;
 if (!connectionURI) {
@@ -9,7 +10,10 @@ if (!connectionURI) {
 }
 
 const pgp = pgPromise({
-    /* Initialization Options */
+    // called when a query is executed
+    query(e) {
+        sqlLogger.debug(e.query);
+    }
 });
 
 const db = pgp(connectionURI);

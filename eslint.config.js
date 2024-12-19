@@ -8,6 +8,8 @@ export default tseslint.config(
             "dist/"
         ],
     },
+    eslint.configs.recommended,
+    tseslint.configs.recommended,
     {
         plugins: {
             "@typescript-eslint": tseslint.plugin
@@ -40,9 +42,8 @@ export default tseslint.config(
                 varsIgnorePattern: "^_+$",
                 argsIgnorePattern: "^_+$",
             }],
+            eqeqeq: "error",
+            "@typescript-eslint/no-explicit-any": "off"
         },
-        
-    },
-    eslint.configs.recommended,
-    tseslint.configs.recommended
+    }
 );

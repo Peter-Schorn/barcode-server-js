@@ -39,8 +39,9 @@
         // override modifier.
         "noImplicitOverride": true,
         
-        // Report errors on unused local variables.
-        "noUnusedLocals": true,
+        // eslint configuration already has a rule for unused variables
+        // and has a pattern to ignore variables named `_`. 
+        "noUnusedLocals": false,
         
         // Report errors on unused parameters in functions.
         // "noUnusedParameters": true,
@@ -56,7 +57,7 @@
     },
     "include": [
         "src/**/*"
-    ],
+, "src/types/express"    ],
     "exclude": [
         "dist",
         "node_modules"
