@@ -5,6 +5,7 @@ import { isValidUUIDv4 } from "../utils/uuid.js";
 import { SQLDefault } from "../database/types.js";
 import { logErrorsMiddleware } from "../middleware/logErrorsMiddleware.js";
 import { mainErrorMiddleware } from "../middleware/mainErrorMiddleware.js";
+import { deleteScansRequestBody } from "../model/DeleteScansRequest.js";
 
 const router = express.Router();
 
@@ -71,8 +72,6 @@ router.get("/users", async (req, res) => {
     res.send(response);
 
 });
-
-
 
 // MARK: POST /scan/<username>
 //
@@ -195,6 +194,62 @@ router.delete("/scans/:username", async (req, res) => {
     logger.debug(`${routeName}: query result: ${JSON.stringify(result)}`);
 
     res.status(204).send();
+
+});
+
+// MARK: DELETE /scans
+//
+// Deletes scanned barcodes by id and/or user from the database.
+//
+// If the query string contains `ids` and/or `users`, then the entire body will
+// be ignored.
+//
+// Request body:
+// { "ids": ["<id1>", "<id2>", ...], users: ["<user1>", "<user2>", ...]}
+// where at least one of `ids` or `users` must be present.
+// 
+// Or, as URL query parameters: a comma separated list:
+// ?ids=<id1>,<id2>...&users=<user1>,<user2>...
+router.delete("/scans", async (req, res) => {
+    
+    const routeName = req.routeName();
+
+    let ids: string[] = [];
+    let users: string[] = [];
+
+    // parameters in query string
+    if (req.query?.ids || req.query?.users) {
+        // TODO: Check if req.query.ids or req.query.ids are arrays,
+        // TODO: which can happen if the query string contains multiple
+        // TODO: instances of these keys
+        ids = (req.query.ids as string)?.split(",");
+        if (!ids.every(isValidUUIDv4)) {
+            res.status(400).send("invalid v4 uuid");
+            return;
+        }
+        users = (req.query.users as string)?.split(",");
+    }
+    // parameters in body
+    else {
+        const requestBody = deleteScansRequestBody.safeParse(req.body);
+        if (requestBody.success) {
+            ids = requestBody.data.ids ?? [];
+            users = requestBody.data.users ?? [];
+        }
+        else {
+            res.status(400).send(requestBody.error.errors);
+            return;
+        }
+    }
+
+    logger.debug(
+        `${routeName}: ` +
+        `ids: ${JSON.stringify(ids)}; ` +
+        `users: ${JSON.stringify(users)};`
+    );
+
+    res.send("Not implemented");
+
 
 });
 
