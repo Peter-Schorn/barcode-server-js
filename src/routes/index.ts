@@ -248,8 +248,18 @@ router.delete("/scans", async (req, res) => {
         `users: ${JSON.stringify(users)};`
     );
 
-    res.send("Not implemented");
+    // TODO: SQL does not support an empty list in the IN clause, so if either
+    // TODO: ids or users is an empty array, the query will fail.
+    const result = await db.result(
+        "DELETE FROM barcodes " +
+        "WHERE id IN (${ids:list}) OR username IN (${users:list})",
+        { ids, users }
+    );
 
+    logger.debug(`${routeName}: query result: ${JSON.stringify(result)}`);
+
+    // TODO: Send information about the number of rows deleted?
+    res.status(204).send();
 
 });
 
