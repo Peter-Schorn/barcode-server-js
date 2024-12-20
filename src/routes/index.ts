@@ -228,6 +228,13 @@ router.delete("/scans", async (req, res) => {
             return;
         }
         users = (req.query.users as string)?.split(",");
+
+        if (ids.length === 0 && users.length === 0) {
+            res.status(400).send(
+                "either 'ids' or 'users' must be provided as a non-empty array"
+            );
+            return;
+        }
     }
     // parameters in body
     else {
