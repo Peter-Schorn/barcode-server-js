@@ -44,7 +44,9 @@
         "noUnusedLocals": false,
         
         // Report errors on unused parameters in functions.
-        // "noUnusedParameters": true,
+        // eslint configuration already has a rule for unused variables
+        // and has a pattern to ignore variables named `_`.
+        "noUnusedParameters": false,
 
         // Report errors for fallthrough cases in switch statements.
         "noFallthroughCasesInSwitch": true,
@@ -57,7 +59,7 @@
     },
     "include": [
         "src/**/*"
-, "src/types/express"    ],
+    ],
     "exclude": [
         "dist",
         "node_modules"

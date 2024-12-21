@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.16.0",
+    "@stylistic/eslint-plugin": "^2.12.1",
     "@types/express": "^5.0.0",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.10.2",
