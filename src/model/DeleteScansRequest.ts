@@ -4,7 +4,7 @@ import { uuidSchema } from "./uuid.js";
 /**
  * Represents the body of the request for the DELETE /scans endpoint, which
  * deletes scanned barcodes by id and/or user from the database.
-*/
+ */
 // TODO: Because these parameters can also be supplied as query parameters,
 // TODO: which allows the body to be empty, should this entire object be
 // TODO: optional?
@@ -18,4 +18,4 @@ export const deleteScansRequestBody = z.object({
 });
 
 
-export type DeleteScansRequestBodyType = z.infer<typeof deleteScansRequestBody>;
+export type DeleteScansRequestBody = z.infer<typeof deleteScansRequestBody>;

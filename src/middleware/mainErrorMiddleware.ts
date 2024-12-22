@@ -3,7 +3,7 @@ import { DatabaseError } from "pg-protocol";
 
 export function mainErrorMiddleware(
     err: any, req: Request, res: Response, next: NextFunction
-) {
+): void {
 
     if (err instanceof DatabaseError) {
         if (
@@ -20,3 +20,4 @@ export function mainErrorMiddleware(
     next(err);
 
 }
+    

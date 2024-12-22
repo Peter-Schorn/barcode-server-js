@@ -66,7 +66,7 @@ router.get("/users", async (req, res) => {
 
     // Extract the username from each row in the result.
     const response = result.map((item) => {
-        return item.username;
+        return item.username as string;
     });
 
     res.send(response);
@@ -110,12 +110,14 @@ router.post("/scan/:username", async (req, res) => {
     let id: string | undefined | typeof SQLDefault;
 
     // parameters in query string
-    if (req.query?.barcode) {
-        barcode = req.query.barcode as string;
-        id = req.query?.id as (string | undefined);
+    const barcodeQueryParam = req.getFirstQueryParamValue("barcode");
+    if (barcodeQueryParam) {
+        barcode = barcodeQueryParam;
+        id = req.getFirstQueryParamValue("id");
     }
     // parameters in body
     else if (req.body?.barcode) {
+        // TODO: use zod to validate the request body
         barcode = req.body.barcode as string;
         id = req.body?.id as (string | undefined);
     }
@@ -201,15 +203,18 @@ router.delete("/scans/:username", async (req, res) => {
 //
 // Deletes scanned barcodes by id and/or user from the database.
 //
+// At least one of `ids` or `users` must be present.
+//
 // If the query string contains `ids` and/or `users`, then the entire body will
 // be ignored.
 //
 // Request body:
 // { "ids": ["<id1>", "<id2>", ...], users: ["<user1>", "<user2>", ...]}
-// where at least one of `ids` or `users` must be present.
+// where at least one of `ids` or `users` must be present as a non-empty array.
 // 
 // Or, as URL query parameters: a comma separated list:
 // ?ids=<id1>,<id2>...&users=<user1>,<user2>...
+// where at least one of `ids` or `users` must be present.
 router.delete("/scans", async (req, res) => {
     
     const routeName = req.routeName();
@@ -217,17 +222,18 @@ router.delete("/scans", async (req, res) => {
     let ids: string[] = [];
     let users: string[] = [];
 
+    const idsQueryParam = req.getFirstQueryParamValue("ids");
+    const usersQueryParam = req.getFirstQueryParamValue("users");
+    
     // parameters in query string
-    if (req.query?.ids || req.query?.users) {
-        // TODO: Check if req.query.ids or req.query.ids are arrays,
-        // TODO: which can happen if the query string contains multiple
-        // TODO: instances of these keys
-        ids = (req.query.ids as string)?.split(",");
+    if (idsQueryParam || usersQueryParam) {
+        ids = idsQueryParam?.split(",") ?? [];
         if (!ids.every(isValidUUIDv4)) {
             res.status(400).send("invalid v4 uuid");
             return;
         }
-        users = (req.query.users as string)?.split(",");
+
+        users = usersQueryParam?.split(",") ?? [];
 
         if (ids.length === 0 && users.length === 0) {
             res.status(400).send(
@@ -238,6 +244,8 @@ router.delete("/scans", async (req, res) => {
     }
     // parameters in body
     else {
+        // the schema enforces that at least one of ids or users must be a
+        // non-empty array
         const requestBody = deleteScansRequestBody.safeParse(req.body);
         if (requestBody.success) {
             ids = requestBody.data.ids ?? [];
@@ -255,11 +263,24 @@ router.delete("/scans", async (req, res) => {
         `users: ${JSON.stringify(users)};`
     );
 
+    let sqlQuery = "DELETE FROM barcodes WHERE ";
+    // at this point, at least one of ids or users is guaranteed to be non-empty
+    if (ids.length > 0) {
+        sqlQuery += "id IN (${ids:list}) ";
+    }
+    if (users.length > 0) {
+        if (ids.length > 0) {
+            sqlQuery += "OR ";
+        }
+        sqlQuery += "username IN (${users:list})";
+    }
+
+    logger.debug(`${routeName}: \`sqlQuery\`: '${sqlQuery}'`);
+
     // TODO: SQL does not support an empty list in the IN clause, so if either
     // TODO: ids or users is an empty array, the query will fail.
     const result = await db.result(
-        "DELETE FROM barcodes " +
-        "WHERE id IN (${ids:list}) OR username IN (${users:list})",
+        sqlQuery,
         { ids, users }
     );
 

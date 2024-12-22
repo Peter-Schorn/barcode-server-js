@@ -1,6 +1,6 @@
 import winston from "winston";
 
-// syslog levels:
+// syslog log levels:
 // {
 //     emerg: 0,
 //     alert: 1,

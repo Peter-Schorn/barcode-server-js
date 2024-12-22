@@ -8,7 +8,7 @@ import { errorToDebugString } from "../utils/errors.js";
  */
 export function logErrorsMiddleware(
     err: any, req: Request, res: Response, next: NextFunction
-) {
+): void {
 
     const routeName = req.routeName();
     const errorString = errorToDebugString(err);

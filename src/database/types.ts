@@ -4,5 +4,5 @@
  */
 export const SQLDefault = {
     rawType: true,
-    toPostgres: () => "DEFAULT"
+    toPostgres: (): string => "DEFAULT"
 };
