@@ -5,7 +5,17 @@ import { isValidUUIDv4 } from "../utils/uuid.js";
 import { SQLDefault } from "../database/types.js";
 import { logErrorsMiddleware } from "../middleware/logErrorsMiddleware.js";
 import { mainErrorMiddleware } from "../middleware/mainErrorMiddleware.js";
-import { deleteScansRequestBody } from "../model/DeleteScansRequest.js";
+import { 
+    deleteScansRequestBody,
+    type DeleteScansRequest
+} from "../model/DeleteScansRequest.js";
+import { 
+    scanBarcodeRequestBody
+} from "../model/ScanBarcodeRequest.js";
+import { 
+    type ScannedBarcodesResponse 
+} from "../model/ScannedBarcodesResponse.js";
+import { type UsersResponse } from "../model/UsersResponse.js";
 
 const router = express.Router();
 
@@ -17,7 +27,7 @@ router.get("/scans", async (req, res) => {
     
     const routeName = req.routeName();
 
-    const result = await db.any(
+    const result: ScannedBarcodesResponse = await db.any(
         "SELECT * FROM barcodes ORDER BY scanned_at DESC"
     );
 
@@ -39,7 +49,7 @@ router.get("/scans/:username", async (req, res) => {
 
     logger.debug(`${routeName}: username: "${username}"`);
 
-    const result = await db.any(
+    const result: ScannedBarcodesResponse = await db.any(
         "SELECT * FROM barcodes WHERE username = ${username} " +
         "ORDER BY scanned_at DESC",
         { username }
@@ -58,7 +68,7 @@ router.get("/users", async (req, res) => {
     
     const routeName = req.routeName();
 
-    const result = await db.any(
+    const result: UsersResponse = await db.any(
         "SELECT DISTINCT username FROM barcodes"
     );
 
@@ -66,7 +76,7 @@ router.get("/users", async (req, res) => {
 
     // Extract the username from each row in the result.
     const response = result.map((item) => {
-        return item.username as string;
+        return item.username;
     });
 
     res.send(response);
@@ -104,10 +114,10 @@ router.post("/scan/:username", async (req, res) => {
 
     const routeName = req.routeName();
 
-    const username: string = req.params.username;
+    const username = req.params.username;
     
     let barcode: string;
-    let id: string | undefined | typeof SQLDefault;
+    let id: string | null | undefined | typeof SQLDefault;
 
     // parameters in query string
     const barcodeQueryParam = req.getFirstQueryParamValue("barcode");
@@ -117,9 +127,19 @@ router.post("/scan/:username", async (req, res) => {
     }
     // parameters in body
     else if (req.body?.barcode) {
-        // TODO: use zod to validate the request body
-        barcode = req.body.barcode as string;
-        id = req.body?.id as (string | undefined);
+        const result = scanBarcodeRequestBody.safeParse(req.body);
+        if (result.success) {
+            barcode = result.data.barcode;
+            id = result.data.id;
+        }
+        else {
+            logger.error(
+                `${routeName}: error parsing request body: ` +
+                `${JSON.stringify(result.error.errors)}`
+            );
+            res.status(400).send(result.error.errors);
+            return;
+        }
     }
     else {
         res.status(400).send("missing parameter 'barcode'");
@@ -145,7 +165,7 @@ router.post("/scan/:username", async (req, res) => {
         id = SQLDefault;
     }
 
-    const result = await db.one(
+    const result: { id: string } = await db.one(
         "INSERT INTO barcodes(id, barcode, username) " +
         "VALUES(${id}, ${barcode}, ${username}) RETURNING id",
         { id, barcode, username }
@@ -177,6 +197,102 @@ router.delete("/all-scans", async (req, res) => {
 
 });
 
+// MARK: DELETE /all-scans/older
+//
+// Deletes all scans for all users older than a specified integer number of
+// seconds from the database.
+//
+// Query parameters:
+// * seconds: The number of seconds that the scans must be older than to be
+//   deleted. For example, if `seconds=3600`, then all barcodes than have been
+//   scanned more than 1 hour ago will be deleted.
+router.delete("/all-scans/older", async (req, res) => {
+    
+    const routeName = req.routeName();
+
+    const secondsQueryParam = req.getFirstQueryParamValue("seconds");
+    logger.debug(`${routeName}: secondsQueryParam: ${secondsQueryParam}`);
+    if (!secondsQueryParam) {
+        res.status(400).send("missing parameter 'seconds'");
+        return;
+    }
+    
+    const seconds = parseInt(secondsQueryParam);
+    logger.debug(`${routeName}: seconds: ${seconds}`);
+    if (isNaN(seconds)) {
+        res.status(400).send("'seconds' must be an integer");
+        return;
+    }
+
+    const currentDate = new Date();
+    const olderThanDate = currentDate.subtractingSeconds(seconds);
+    logger.debug(
+        `${routeName}: will delete barcodes older than: ` +
+        `${olderThanDate.toISOString()}; ` +
+        `current date: ${currentDate.toISOString()}`
+    );
+
+    const result = await db.result(
+        "DELETE FROM barcodes WHERE scanned_at < ${olderThanDate}",
+        { olderThanDate }
+    );
+
+    logger.debug(`${routeName}: query result: ${JSON.stringify(result)}`);
+
+    res.status(204).send();
+
+});
+
+// MARK: DELETE /scans/<username>/older
+//
+// Deletes all scanned barcodes for a specific user older than a specified
+// integer number of seconds from the database.
+//
+// Query parameters:
+// * seconds: The number of seconds that the scans must be older than to be
+//   deleted. For example, if `seconds=3600`, then all barcodes than have been
+//   scanned more than 1 hour ago by the given user will be deleted.
+router.delete("/scans/:username/older", async (req, res) => {
+    
+    const routeName = req.routeName();
+
+    const username = req.params.username;
+
+    const secondsQueryParam = req.getFirstQueryParamValue("seconds");
+    logger.debug(`${routeName}: secondsQueryParam: ${secondsQueryParam}`);
+    if (!secondsQueryParam) {
+        res.status(400).send("missing parameter 'seconds'");
+        return;
+    }
+    
+    const seconds = parseInt(secondsQueryParam);
+    logger.debug(`${routeName}: seconds: ${seconds}`);
+    if (isNaN(seconds)) {
+        res.status(400).send("'seconds' must be an integer");
+        return;
+    }
+
+    const currentDate = new Date();
+    const olderThanDate = currentDate.subtractingSeconds(seconds);
+    logger.debug(
+        `${routeName}: will delete barcodes for ${username} older than: ` +
+        `${olderThanDate.toISOString()}; ` +
+        `current date: ${currentDate.toISOString()}`
+    );
+
+    const result = await db.result(
+        "DELETE FROM barcodes WHERE username = ${username} " +
+        "AND scanned_at < ${olderThanDate}",
+        { username, olderThanDate }
+    );
+
+    logger.debug(`${routeName}: query result: ${JSON.stringify(result)}`);
+
+    res.status(204).send();
+
+});
+
+
 // MARK: DELETE /scans/<username>
 //
 // Deletes all scanned barcodes for a specific user from the database.
@@ -184,7 +300,7 @@ router.delete("/scans/:username", async (req, res) => {
     
     const routeName = req.routeName();
 
-    const username: string = req.params.username;
+    const username = req.params.username;
 
     logger.debug(`${routeName}: username: "${username}"`);
 
@@ -215,7 +331,7 @@ router.delete("/scans/:username", async (req, res) => {
 // Or, as URL query parameters: a comma separated list:
 // ?ids=<id1>,<id2>...&users=<user1>,<user2>...
 // where at least one of `ids` or `users` must be present.
-router.delete("/scans", async (req, res) => {
+router.delete("/scans", async (req: DeleteScansRequest, res) => {
     
     const routeName = req.routeName();
 
@@ -246,13 +362,13 @@ router.delete("/scans", async (req, res) => {
     else {
         // the schema enforces that at least one of ids or users must be a
         // non-empty array
-        const requestBody = deleteScansRequestBody.safeParse(req.body);
-        if (requestBody.success) {
-            ids = requestBody.data.ids ?? [];
-            users = requestBody.data.users ?? [];
+        const result = deleteScansRequestBody.safeParse(req.body);
+        if (result.success) {
+            ids = result.data.ids ?? [];
+            users = result.data.users ?? [];
         }
         else {
-            res.status(400).send(requestBody.error.errors);
+            res.status(400).send(result.error.errors);
             return;
         }
     }
@@ -277,8 +393,6 @@ router.delete("/scans", async (req, res) => {
 
     logger.debug(`${routeName}: \`sqlQuery\`: '${sqlQuery}'`);
 
-    // TODO: SQL does not support an empty list in the IN clause, so if either
-    // TODO: ids or users is an empty array, the query will fail.
     const result = await db.result(
         sqlQuery,
         { ids, users }

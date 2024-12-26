@@ -5,7 +5,7 @@ import stylistic from "@stylistic/eslint-plugin";
 
 // https://eslint.org/docs/latest/use/configure/configuration-files
 // https://typescript-eslint.io/
-// ESLint Stylistic: https://eslint.style/
+// ESLint Stylistic: https://eslint.style/packages/default
 export default tseslint.config(
     {
         ignores: [
@@ -46,20 +46,38 @@ export default tseslint.config(
         rules: {
             "@typescript-eslint/explicit-function-return-type": "error",
             "@stylistic/semi": ["error", "always"],
-            "@stylistic/member-delimiter-style": "error",
+            "@stylistic/member-delimiter-style": ["error", {
+                multiline: {
+                    delimiter: "semi",
+                    requireLast: true
+                },
+                singleline: {
+                    delimiter: "comma",
+                    requireLast: false
+                },
+            }],
             quotes: ["error", "double", { avoidEscape: true }],
             "no-console": "off",
             "prefer-const": "error",
             "@typescript-eslint/no-unused-vars": ["warn", {
                 varsIgnorePattern: "^_+$",
-                argsIgnorePattern: "^_+$",
+                argsIgnorePattern: "^_+$"
             }],
             eqeqeq: "error",
-            "@typescript-eslint/no-explicit-any": "off",
             "no-unreachable": "warn",
+            "@stylistic/max-len": ["error", {
+                code: 80,
+                ignoreComments: false,
+            }],
+            "no-var": "error",
+            
+            // might want to reenable these
             "@typescript-eslint/no-unsafe-member-access": "off",
-            "@typescript-eslint/restrict-template-expressions": "off",
             "@typescript-eslint/no-unsafe-assignment": "off",
+
+            // probably should stay off
+            "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/restrict-template-expressions": "off"
         },
     }
 );

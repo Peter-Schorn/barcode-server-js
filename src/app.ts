@@ -1,6 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import "./utils/express-extensions.js";
+import "./utils/date.js";
 import router from "./routes/index.js";
 
 // MARK: configure app

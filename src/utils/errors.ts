@@ -27,7 +27,7 @@ export function errorToDebugString(error: unknown): string {
         return JSON.stringify(error);
     }
 
-    const errorDetails: { [key: string]: any }  = {};
+    const errorDetails: { [key: string]: unknown }  = {};
     
     const name = error.name;
     if (name) {
