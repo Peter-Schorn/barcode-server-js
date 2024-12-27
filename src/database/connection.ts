@@ -13,6 +13,9 @@ const pgp = pgPromise({
     // called when a query is executed
     query(e) {
         sqlLogger.debug(e.query);
+    },
+    connect() {
+        sqlLogger.debug("connected to database");
     }
 });
 
