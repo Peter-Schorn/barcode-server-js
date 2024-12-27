@@ -2,7 +2,7 @@ import "dotenv/config";
 import app from "./app.js";
 import { logger } from "./logging/loggers.js";
 
-const port = process.env.PORT ?? 3000;
+const port = process.env.PORT ?? 8080;
 app.listen(port, () => {
     
     console.log(`LOG_LEVEL: ${process.env.LOG_LEVEL}`);
