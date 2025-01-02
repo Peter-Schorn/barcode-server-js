@@ -17,8 +17,8 @@ class WebSocketManager {
         const clientCount = this.clients.size;
 
         logger.debug(
-            `WebSocketManager: added client for user '${client.username}' ` +
-            `(id: ${client.id}); total clients: ${clientCount}`
+            `WebSocketManager: added socket for user '${client.username}' ` +
+            `(id: ${client.id}); total sockets: ${clientCount}`
         );
 
         client.websocket.on("message", (message) => {
@@ -28,28 +28,28 @@ class WebSocketManager {
                 JSON.stringify(message);
 
             logger.debug(
-                `WebSocketManager: client for user '${client.username}' ` +
+                `WebSocketManager: socket for user '${client.username}' ` +
                 `(id: ${client.id}) message: ${messageString}`
             );
         });
 
         client.websocket.on("ping", (data) => {
             logger.debug(
-                `WebSocketManager: client for user '${client.username}' ` +
+                `WebSocketManager: socket for user '${client.username}' ` +
                 `(id: ${client.id}) ping: ${data.toString()}`
             );
         });
 
         client.websocket.on("pong", (data) => {
             logger.debug(
-                `WebSocketManager: client for user '${client.username}' ` +
+                `WebSocketManager: socket for user '${client.username}' ` +
                 `(id: ${client.id}) pong: ${data.toString()}`
             );
         });
 
         client.websocket.on("close", (code, reason) => {
             logger.debug(
-                `WebSocketManager: client for user '${client.username}' ` +
+                `WebSocketManager: socket for user '${client.username}' ` +
                 `(id: ${client.id}) closed: code: ${code}, ` +
                 `reason: ${reason.toString()}`
             );
@@ -59,7 +59,7 @@ class WebSocketManager {
         client.websocket.on("error", (error) => {
             const errorString = errorToDebugString(error);
             logger.error(
-                `WebSocketManager: client for user '${client.username}' ` +
+                `WebSocketManager: socket for user '${client.username}' ` +
                 `(id: ${client.id}) error: ${errorString}`
             );
             // Shouldn't need to remove the client here, right?

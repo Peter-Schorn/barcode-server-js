@@ -23,7 +23,7 @@
         // Specify a set of bundled library declaration files that describe the 
         // target runtime environment.
         "lib": [
-            "es2022"
+            "es2024"
         ],
 
         "allowJs": true,
