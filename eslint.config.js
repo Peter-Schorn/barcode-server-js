@@ -67,6 +67,8 @@ export default tseslint.config(
             "no-unreachable": "warn",
             "@stylistic/max-len": ["error", {
                 code: 80,
+                // ignore eslint-disable comments
+                ignorePattern: "^\\s*//\\s*eslint-disable",
                 ignoreComments: false,
             }],
             "no-var": "error",
@@ -74,7 +76,7 @@ export default tseslint.config(
             // might want to reenable these
             "@typescript-eslint/no-unsafe-member-access": "off",
             "@typescript-eslint/no-unsafe-assignment": "off",
-
+            
             // probably should stay off
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/restrict-template-expressions": "off"

@@ -16,6 +16,12 @@ const pgp = pgPromise({
     },
     connect() {
         sqlLogger.debug("connected to database");
+    },
+    disconnect() {
+        sqlLogger.debug("disconnected from database");
+    },
+    error(err) {
+        sqlLogger.error(`database error: ${err.message}`);
     }
 });
 
