@@ -27,4 +27,5 @@ const pgp = pgPromise({
 
 const db = pgp(connectionURI);
 
+export { pgp };
 export default db;
