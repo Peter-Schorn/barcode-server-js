@@ -1,43 +1,47 @@
 {
-  "name": "barcode-server-js",
-  "version": "0.0.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "start": "node dist/index.js",
-    "build": "npm run clean && tsc",
-    "build-watch": "tsc --watch",
-    "clean": "rm -rf dist/*",
-    "dev": "tsx src/index.ts",
-    "watch": "tsx watch src/index.ts",
-    "lint": "eslint ."
-  },
-  "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^5.0.1",
-    "morgan": "~1.9.1",
-    "pg": "^8.13.1",
-    "pg-promise": "^11.10.2",
-    "uuid": "^11.0.3",
-    "websocket-express": "^3.1.2",
-    "winston": "^3.17.0",
-    "ws": "^8.18.0",
-    "zod": "^3.24.1"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.16.0",
-    "@stylistic/eslint-plugin": "^2.12.1",
-    "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.0",
-    "@types/morgan": "^1.9.9",
-    "@types/node": "^22.10.2",
-    "@types/pg": "^8.11.10",
-    "@types/ws": "^8.5.13",
-    "eslint": "^9.17.0",
-    "globals": "^15.13.0",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.2",
-    "typescript-eslint": "^8.18.0"
-  }
+    "name": "barcode-server-js",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "start": "node dist/index.js",
+        "build": "npm run clean && tsc",
+        "build-watch": "tsc --watch",
+        "clean": "rm -rf dist/*",
+        "dev": "tsx src/index.ts",
+        "watch": "tsx watch src/index.ts",
+        "lint": "eslint . --max-warnings 0"
+    },
+    "pre-commit": [
+        "lint"
+    ],
+    "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.5",
+        "express": "^5.0.1",
+        "morgan": "~1.9.1",
+        "pg": "^8.13.1",
+        "pg-promise": "^11.10.2",
+        "uuid": "^11.0.3",
+        "websocket-express": "^3.1.2",
+        "winston": "^3.17.0",
+        "ws": "^8.18.0",
+        "zod": "^3.24.1"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.16.0",
+        "@stylistic/eslint-plugin": "^2.12.1",
+        "@types/cors": "^2.8.17",
+        "@types/express": "^5.0.0",
+        "@types/morgan": "^1.9.9",
+        "@types/node": "^22.10.2",
+        "@types/pg": "^8.11.10",
+        "@types/ws": "^8.5.13",
+        "eslint": "^9.17.0",
+        "globals": "^15.13.0",
+        "pre-commit": "^1.2.2",
+        "tsx": "^4.19.2",
+        "typescript": "^5.7.2",
+        "typescript-eslint": "^8.18.0"
+    }
 }

@@ -78,7 +78,7 @@ export default tseslint.config(
             // instead
             "@typescript-eslint/prefer-for-of": "error",
 
-            // might want to reenable these
+            // TODO: might want to reenable these
             "@typescript-eslint/no-unsafe-member-access": "off",
             "@typescript-eslint/no-unsafe-assignment": "off",
 
