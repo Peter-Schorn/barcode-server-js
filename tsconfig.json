@@ -50,6 +50,8 @@
 
         // Report errors for fallthrough cases in switch statements.
         "noFallthroughCasesInSwitch": true,
+
+        "noUncheckedSideEffectImports": true,
         
         // Specify the root directory of input files.
         "rootDir": "src",

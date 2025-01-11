@@ -31,10 +31,10 @@ export default tseslint.config(
                 sourceType: "module",
                 project: [
                     "./tsconfig.json",
-                    // necessary for linting the eslint.config.js file itself 
-                    // because eslint uses the "compilerOptions.include" key of 
-                    // the tsconfig to determine which files to lint, but if we 
-                    // put eslint.config.js in the tsconfig.json then typescript
+                    // necessary for linting the eslint.config.js file itself
+                    // because eslint uses the "include" key of the tsconfig to
+                    // determine which files to lint, but if we put
+                    // eslint.config.js in the tsconfig.json then typescript
                     // would try to compile it
                     "./tsconfig.eslint.json"
                 ]
@@ -46,6 +46,8 @@ export default tseslint.config(
         rules: {
             "@typescript-eslint/explicit-function-return-type": "error",
             "@stylistic/semi": ["error", "always"],
+            "@stylistic/no-extra-semi": "error",
+            "@stylistic/no-trailing-spaces": "warn",
             "@stylistic/member-delimiter-style": ["error", {
                 multiline: {
                     delimiter: "semi",
@@ -72,11 +74,14 @@ export default tseslint.config(
                 ignoreComments: false,
             }],
             "no-var": "error",
-            
+            // disallows c-style for-loops when a for-of loop could be used
+            // instead
+            "@typescript-eslint/prefer-for-of": "error",
+
             // might want to reenable these
             "@typescript-eslint/no-unsafe-member-access": "off",
             "@typescript-eslint/no-unsafe-assignment": "off",
-            
+
             // probably should stay off
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/restrict-template-expressions": "off"

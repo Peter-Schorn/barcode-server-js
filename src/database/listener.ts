@@ -9,7 +9,7 @@ import {
     type ScannedBarcodesResponse,
     type ScannedBarcodeResponse
 } from "../model/ScannedBarcodesResponse.js";
-import { 
+import {
     type DeletedScansNotification
 } from "../model/DeletedScansNotification.js";
 
@@ -32,7 +32,7 @@ let connection: IConnected<object, IClient> | null;
 function onNotification(notification: Notification): void {
 
     logger.debug(`Listener: Received Payload ${notification.payload}`);
-    
+
     if (!notification.payload) {
         logger.error("Listener: Payload is empty");
         return;
@@ -128,11 +128,11 @@ function onNotification(notification: Notification): void {
                 ]
                 */
                 const data = json.data as DeletedScansNotification;
-                
+
                 /*
                 [
                     "peter": [
-                        "32510738-b792-4045-b460-69879b43b920", 
+                        "32510738-b792-4045-b460-69879b43b920",
                         "118ec805-8636-4446-95dc-bcdf65473e00"
                     ],
                     "nicholas": [

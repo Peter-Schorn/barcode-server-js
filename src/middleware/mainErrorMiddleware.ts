@@ -7,7 +7,7 @@ export function mainErrorMiddleware(
 
     if (err instanceof DatabaseError) {
         if (
-            err.code === "23505" && 
+            err.code === "23505" &&
             err.constraint === "barcodes_pkey"
         ) {
             res.status(400).send(
@@ -16,8 +16,7 @@ export function mainErrorMiddleware(
             return;
         }
     }
-    
+
     next(err);
 
 }
-    

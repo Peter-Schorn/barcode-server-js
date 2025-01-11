@@ -4,7 +4,7 @@ import { errorToDebugString } from "../utils/errors.js";
 
 /**
  * A middleware that logs errors using the logger.
- * 
+ *
  */
 export function logErrorsMiddleware(
     err: any, req: Request, res: Response, next: NextFunction

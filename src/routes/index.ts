@@ -5,15 +5,15 @@ import { isValidUUIDv4 } from "../utils/uuid.js";
 import { SQLDefault } from "../database/types.js";
 import { logErrorsMiddleware } from "../middleware/logErrorsMiddleware.js";
 import { mainErrorMiddleware } from "../middleware/mainErrorMiddleware.js";
-import { 
+import {
     deleteScansRequestBody,
     type DeleteScansRequest
 } from "../model/DeleteScansRequest.js";
-import { 
+import {
     scanBarcodeRequestBody
 } from "../model/ScanBarcodeRequest.js";
-import { 
-    type ScannedBarcodesResponse 
+import {
+    type ScannedBarcodesResponse
 } from "../model/ScannedBarcodesResponse.js";
 import { type UsersResponse } from "../model/UsersResponse.js";
 
@@ -24,7 +24,7 @@ const router = express.Router();
 // Retrieves all scanned barcodes from the database, sorted in descending order
 // by "scanned_at" (the date they were scanned).
 router.get("/scans", async (req, res) => {
-    
+
     const routeName = req.routeName();
 
     const result: ScannedBarcodesResponse = await db.any(
@@ -42,7 +42,7 @@ router.get("/scans", async (req, res) => {
 // Retrieves all scanned barcodes for a specific user from the database, sorted
 // in descending order by "scanned_at" (the date they were scanned).
 router.get("/scans/:username", async (req, res) => {
-    
+
     const routeName = req.routeName();
 
     const username: string = req.params.username;
@@ -65,7 +65,7 @@ router.get("/scans/:username", async (req, res) => {
 //
 // Retrieves all users from the database.
 router.get("/users", async (req, res) => {
-    
+
     const routeName = req.routeName();
 
     const result: UsersResponse = await db.any(
@@ -115,7 +115,7 @@ router.post("/scan/:username", async (req, res) => {
     const routeName = req.routeName();
 
     const username = req.params.username;
-    
+
     let barcode: string;
     let id: string | null | undefined | typeof SQLDefault;
 
@@ -152,7 +152,7 @@ router.post("/scan/:username", async (req, res) => {
         `barcode: "${barcode}"; ` +
         `id: ${id};`
     );
-    
+
     if (id) {
         if (!isValidUUIDv4(id)) {
             res.status(400).send("invalid v4 uuid");
@@ -174,8 +174,9 @@ router.post("/scan/:username", async (req, res) => {
     const insertedId: string = result.id;
 
     logger.debug(`${routeName}: query result: ${JSON.stringify(result)}`);
-    
+
     res.header("Barcode-ID", insertedId);
+    res.contentType("text/plain");
     res.send(`user '${username}' scanned '${barcode}' (id: ${insertedId})`);
 
 });
@@ -184,7 +185,7 @@ router.post("/scan/:username", async (req, res) => {
 //
 // Deletes all scanned barcodes from the database.
 router.delete("/all-scans", async (req, res) => {
-    
+
     const routeName = req.routeName();
 
     const result = await db.result(
@@ -207,7 +208,7 @@ router.delete("/all-scans", async (req, res) => {
 //   deleted. For example, if `seconds=3600`, then all barcodes than have been
 //   scanned more than 1 hour ago will be deleted.
 router.delete("/all-scans/older", async (req, res) => {
-    
+
     const routeName = req.routeName();
 
     const secondsQueryParam = req.getFirstQueryParamValue("seconds");
@@ -216,7 +217,7 @@ router.delete("/all-scans/older", async (req, res) => {
         res.status(400).send("missing parameter 'seconds'");
         return;
     }
-    
+
     const seconds = parseInt(secondsQueryParam);
     logger.debug(`${routeName}: seconds: ${seconds}`);
     if (isNaN(seconds)) {
@@ -253,7 +254,7 @@ router.delete("/all-scans/older", async (req, res) => {
 //   deleted. For example, if `seconds=3600`, then all barcodes than have been
 //   scanned more than 1 hour ago by the given user will be deleted.
 router.delete("/scans/:username/older", async (req, res) => {
-    
+
     const routeName = req.routeName();
 
     const username = req.params.username;
@@ -264,7 +265,7 @@ router.delete("/scans/:username/older", async (req, res) => {
         res.status(400).send("missing parameter 'seconds'");
         return;
     }
-    
+
     const seconds = parseInt(secondsQueryParam);
     logger.debug(`${routeName}: seconds: ${seconds}`);
     if (isNaN(seconds)) {
@@ -297,7 +298,7 @@ router.delete("/scans/:username/older", async (req, res) => {
 //
 // Deletes all scanned barcodes for a specific user from the database.
 router.delete("/scans/:username", async (req, res) => {
-    
+
     const routeName = req.routeName();
 
     const username = req.params.username;
@@ -327,12 +328,12 @@ router.delete("/scans/:username", async (req, res) => {
 // Request body:
 // { "ids": ["<id1>", "<id2>", ...], users: ["<user1>", "<user2>", ...]}
 // where at least one of `ids` or `users` must be present as a non-empty array.
-// 
+//
 // Or, as URL query parameters: a comma separated list:
 // ?ids=<id1>,<id2>...&users=<user1>,<user2>...
 // where at least one of `ids` or `users` must be present.
 router.delete("/scans", async (req: DeleteScansRequest, res) => {
-    
+
     const routeName = req.routeName();
 
     let ids: string[] = [];
@@ -340,7 +341,7 @@ router.delete("/scans", async (req: DeleteScansRequest, res) => {
 
     const idsQueryParam = req.getFirstQueryParamValue("ids");
     const usersQueryParam = req.getFirstQueryParamValue("users");
-    
+
     // parameters in query string
     if (idsQueryParam || usersQueryParam) {
         ids = idsQueryParam?.split(",") ?? [];

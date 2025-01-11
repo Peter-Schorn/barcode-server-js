@@ -3,15 +3,15 @@ import { logger } from "../logging/loggers.js";
 import { errorToDebugString } from "../utils/errors.js";
 
 class WebSocketManager {
-    
+
     private clients: Map<string, WebSocketClient>;
-    
+
     constructor() {
         this.clients = new Map();
     }
 
     addClient(client: WebSocketClient): void {
-        
+
         this.clients.set(client.id, client);
 
         const clientCount = this.clients.size;
@@ -22,9 +22,9 @@ class WebSocketManager {
         );
 
         client.websocket.on("message", (message) => {
-            
-            const messageString = Buffer.isBuffer(message) ? 
-                message.toString(): 
+
+            const messageString = Buffer.isBuffer(message) ?
+                message.toString() :
                 JSON.stringify(message);
 
             logger.debug(
@@ -80,7 +80,7 @@ class WebSocketManager {
 
     /**
      * Gets all clients for a given user.
-     * 
+     *
      * @param username the username of the user to get clients for
      * @returns an array of WebSocketClient objects for the given user
      */
@@ -96,7 +96,7 @@ class WebSocketManager {
 
     /**
      *  Sends a JSON message to all clients for a given user.
-     * 
+     *
      * @param username the username of the user to send the message to
      * @param data the data to send to the user, which will be serialized to
      * JSON
@@ -104,13 +104,13 @@ class WebSocketManager {
     sendJSONToUser(username: string, data: any): void {
 
         const clients = this.getAllClientsForUser(username);
-        
+
         for (const client of clients) {
             if (client.websocket.readyState === WebSocket.OPEN) {
                 client.sendJSON(data);
             }
         }
-        
+
     }
 
 }

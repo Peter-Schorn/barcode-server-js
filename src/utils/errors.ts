@@ -17,7 +17,7 @@ export function isNodeError(error: unknown): error is NodeJS.ErrnoException {
 /**
  * Converts an error to a string that can be used for debugging purposes,
  * such as logging.
- * 
+ *
  * @param error The error to convert.
  * @returns A string representation of the error.
  */
@@ -28,7 +28,7 @@ export function errorToDebugString(error: unknown): string {
     }
 
     const errorDetails: { [key: string]: unknown }  = {};
-    
+
     const name = error.name;
     if (name) {
         errorDetails.name = name;
@@ -38,7 +38,7 @@ export function errorToDebugString(error: unknown): string {
     if (message) {
         errorDetails.message = message;
     }
-    
+
     const cause = error.cause;
     if (cause) {
         errorDetails.cause = cause;
@@ -47,11 +47,11 @@ export function errorToDebugString(error: unknown): string {
     const propertyNames = Object.getOwnPropertyNames(error)
         .filter((propertyName) => propertyName !== "stack");
 
-    
+
     for (const propertyName of propertyNames) {
         errorDetails[propertyName] = (error as any)[propertyName];
     }
-    
+
     return JSON.stringify(errorDetails);
-   
+
 }
