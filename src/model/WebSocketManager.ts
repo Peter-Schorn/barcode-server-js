@@ -2,6 +2,7 @@ import { WebSocketClient } from "./WebSocketClient.js";
 import { logger } from "../logging/loggers.js";
 import { errorToDebugString } from "../utils/errors.js";
 import { db } from "../database/connection.js";
+import { PROCESS_UUID } from "../index.js";
 
 class WebSocketManager {
 
@@ -23,17 +24,19 @@ class WebSocketManager {
         );
 
         db.none(
-            "INSERT INTO websocket_connections (id, username) " +
-            "VALUES (${id}, ${username})",
+            "INSERT INTO websocket_connections " +
+            "(socket_id, process_uuid, username) " +
+            "VALUES (${socket_id}, ${process_uuid}, ${username})",
             {
-                id: client.id,
+                socket_id: client.id,
+                process_uuid: PROCESS_UUID,
                 username: client.username
             }
         )
         .catch((error) => {
             logger.error(
-                "WebSocketManager: error adding socket for user " +
-                `'${client.username}' (id: ${client.id}) to database: ` +
+                "WebSocketManager: error adding socket to database for user " +
+                `'${client.username}' (id: ${client.id}): ` +
                 `${errorToDebugString(error)}`
             );
         });
@@ -77,8 +80,9 @@ class WebSocketManager {
             this.removeClient(client);
 
             db.none(
-                "DELETE FROM websocket_connections WHERE id = ${id}",
-                { id: client.id }
+                "DELETE FROM websocket_connections " +
+                "WHERE socket_id = ${socket_id}",
+                { socket_id: client.id }
             )
             .catch((error) => {
                 logger.error(
