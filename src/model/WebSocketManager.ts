@@ -1,6 +1,7 @@
 import { WebSocketClient } from "./WebSocketClient.js";
 import { logger } from "../logging/loggers.js";
 import { errorToDebugString } from "../utils/errors.js";
+import { db } from "../database/connection.js";
 
 class WebSocketManager {
 
@@ -21,6 +22,23 @@ class WebSocketManager {
             `(id: ${client.id}); total sockets: ${clientCount}`
         );
 
+        db.none(
+            "INSERT INTO websocket_connections (id, username) " +
+            "VALUES (${id}, ${username})",
+            {
+                id: client.id,
+                username: client.username
+            }
+        )
+        .catch((error) => {
+            logger.error(
+                "WebSocketManager: error adding socket for user " +
+                `'${client.username}' (id: ${client.id}) to database: ` +
+                `${errorToDebugString(error)}`
+            );
+        });
+
+
         client.websocket.on("message", (message) => {
 
             const messageString = Buffer.isBuffer(message) ?
@@ -31,6 +49,9 @@ class WebSocketManager {
                 `WebSocketManager: socket for user '${client.username}' ` +
                 `(id: ${client.id}) message: ${messageString}`
             );
+            if (messageString === "ping") {
+                client.websocket.send("pong");
+            }
         });
 
         client.websocket.on("ping", (data) => {
@@ -54,6 +75,19 @@ class WebSocketManager {
                 `reason: ${reason.toString()}`
             );
             this.removeClient(client);
+
+            db.none(
+                "DELETE FROM websocket_connections WHERE id = ${id}",
+                { id: client.id }
+            )
+            .catch((error) => {
+                logger.error(
+                    "WebSocketManager: error removing socket for user " +
+                    `'${client.username}' (id: ${client.id}) from database: ` +
+                    `${errorToDebugString(error)}`
+                );
+            });
+
         });
 
         client.websocket.on("error", (error) => {
@@ -102,6 +136,8 @@ class WebSocketManager {
      * JSON
      */
     sendJSONToUser(username: string, data: any): void {
+
+        logger.debug(`WebSocketManager: sending JSON to user '${username}'`);
 
         const clients = this.getAllClientsForUser(username);
 

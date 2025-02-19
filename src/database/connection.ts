@@ -9,7 +9,7 @@ if (!connectionURI) {
     );
 }
 
-const pgp = pgPromise({
+export const pgp = pgPromise({
     // called when a query is executed
     query(e) {
         sqlLogger.debug(e.query);
@@ -25,7 +25,4 @@ const pgp = pgPromise({
     }
 });
 
-const db = pgp(connectionURI);
-
-export { pgp };
-export default db;
+export const db = pgp(connectionURI);

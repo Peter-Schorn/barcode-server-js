@@ -1,5 +1,5 @@
 import express from "express";
-import db from "../database/connection.js";
+import { db } from "../database/connection.js";
 import { logger } from "../logging/loggers.js";
 import { isValidUUIDv4 } from "../utils/uuid.js";
 import { SQLDefault } from "../database/types.js";

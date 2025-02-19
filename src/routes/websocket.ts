@@ -16,7 +16,7 @@ wsRouter.ws("/:username", async (req, res) => {
 
     const routeName = "/watch/:username";
 
-    const username = req.params.username;
+    const username = req.params.username!;
     logger.debug(`${routeName}: username: ${username}`);
 
     const webSocket = await res.accept();

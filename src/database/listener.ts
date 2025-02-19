@@ -1,6 +1,6 @@
 import { type IConnected, type ILostContext } from "pg-promise";
 import { type Notification } from "pg";
-import db from "./connection.js";
+import { db } from "./connection.js";
 import { pgp } from "./connection.js";
 import { logger } from "../logging/loggers.js";
 import { errorToDebugString } from "../utils/errors.js";
@@ -210,6 +210,7 @@ function onConnectionLost(err: Error, e: ILostContext<IClient>): void {
         });
 }
 
+// TODO: Use a backoff algorithm to reconnect
 function reconnect(
     delay: number = 0,
     maxAttempts: number = 1
@@ -243,7 +244,7 @@ function reconnect(
 }
 
 try {
-    await reconnect();
+    await reconnect(5_000, 10); // retry 10 times, with 5-second intervals
     logger.debug("Listener: Successful Initial Connection");
 
 } catch (error) {

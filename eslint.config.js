@@ -74,6 +74,13 @@ export default tseslint.config(
                 ignoreComments: false,
             }],
             "no-var": "error",
+            "func-style": ["error", "declaration", {
+                allowArrowFunctions: false
+            }],
+            "curly": "error",
+            "@typescript-eslint/switch-exhaustiveness-check": ["error", {
+                requireDefaultForNonUnion: true
+            }],
             // disallows c-style for-loops when a for-of loop could be used
             // instead
             "@typescript-eslint/prefer-for-of": "error",

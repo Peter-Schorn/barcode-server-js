@@ -2,25 +2,25 @@
 // https://www.totaltypescript.com/tsconfig-cheat-sheet
 {
     "compilerOptions": {
-        
+
         // Set the JavaScript language version for emitted JavaScript and
         // include compatible library declarations.
         "target": "ES2022",
-        
+
         // Specify what module code is generated.
         "module": "NodeNext",
-        
-        // Emit additional JavaScript to ease support for importing CommonJS 
-        // modules. This enables 'allowSyntheticDefaultImports' for type 
+
+        // Emit additional JavaScript to ease support for importing CommonJS
+        // modules. This enables 'allowSyntheticDefaultImports' for type
         // compatibility.
         "esModuleInterop": true,
-        
-        // Do not transform or elide any imports or exports not marked as 
-        // type-only, ensuring they are written in the output file's format 
+
+        // Do not transform or elide any imports or exports not marked as
+        // type-only, ensuring they are written in the output file's format
         // based on the 'module' setting.
         "verbatimModuleSyntax": true,
-        
-        // Specify a set of bundled library declaration files that describe the 
+
+        // Specify a set of bundled library declaration files that describe the
         // target runtime environment.
         "lib": [
             "es2024"
@@ -28,21 +28,21 @@
 
         "allowJs": true,
         "checkJs": true,
-        
+
         // Ensure that casing is correct in imports.
         "forceConsistentCasingInFileNames": true,
-        
+
         // Enable all strict type-checking options.
         "strict": true,
-        
-        // Ensure overriding members in derived classes are marked with an 
+
+        // Ensure overriding members in derived classes are marked with an
         // override modifier.
         "noImplicitOverride": true,
-        
+
         // eslint configuration already has a rule for unused variables
-        // and has a pattern to ignore variables named `_`. 
+        // and has a pattern to ignore variables named `_`.
         "noUnusedLocals": false,
-        
+
         // Report errors on unused parameters in functions.
         // eslint configuration already has a rule for unused variables
         // and has a pattern to ignore variables named `_`.
@@ -52,10 +52,16 @@
         "noFallthroughCasesInSwitch": true,
 
         "noUncheckedSideEffectImports": true,
-        
+
+        "noImplicitReturns": true,
+
+        "noImplicitAny": true,
+
+        "noUncheckedIndexedAccess": true,
+
         // Specify the root directory of input files.
         "rootDir": "src",
-        
+
         // Specify an output folder for all emitted files.
         "outDir": "dist",
     },
