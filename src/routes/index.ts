@@ -17,6 +17,12 @@ import {
     type ScannedBarcodesResponse
 } from "../model/ScannedBarcodesResponse.js";
 import { type UsersResponse } from "../model/UsersResponse.js";
+import { type GetScansResponse } from "../types/routes/GetScansResponse.js";
+import { type GetUsersResponse } from "../types/routes/GetUsersResponse.js";
+import {
+    type DeleteUserScansRequest
+ } from "../types/routes/DeleteUserScansRequest.js";
+
 
 const router = express.Router();
 
@@ -24,7 +30,7 @@ const router = express.Router();
 //
 // Retrieves all scanned barcodes from the database, sorted in descending order
 // by "scanned_at" (the date they were scanned).
-router.get("/scans", async (req, res) => {
+router.get("/scans", async (req, res: GetScansResponse) => {
 
     const routeName = req.routeName();
 
@@ -34,7 +40,7 @@ router.get("/scans", async (req, res) => {
 
     logger.debug(`${routeName}: query result: ${JSON.stringify(result)}`);
 
-    res.send(result);
+    res.json(result);
 
 });
 
@@ -42,7 +48,7 @@ router.get("/scans", async (req, res) => {
 //
 // Retrieves all scanned barcodes for a specific user from the database, sorted
 // in descending order by "scanned_at" (the date they were scanned).
-router.get("/scans/:username", async (req, res) => {
+router.get("/scans/:username", async (req, res: GetScansResponse) => {
 
     const routeName = req.routeName();
 
@@ -58,14 +64,14 @@ router.get("/scans/:username", async (req, res) => {
 
     logger.debug(`${routeName}: query result: ${JSON.stringify(result)}`);
 
-    res.send(result);
+    res.json(result);
 
 });
 
 // MARK: GET /users
 //
 // Retrieves all users from the database.
-router.get("/users", async (req, res) => {
+router.get("/users", async (req, res: GetUsersResponse) => {
 
     const routeName = req.routeName();
 
@@ -80,7 +86,7 @@ router.get("/users", async (req, res) => {
         return item.username;
     });
 
-    res.send(response);
+    res.json(response);
 
 });
 
@@ -300,7 +306,7 @@ router.delete("/scans/:username/older", async (req, res) => {
 // MARK: DELETE /scans/<username>
 //
 // Deletes all scanned barcodes for a specific user from the database.
-router.delete("/scans/:username", async (req, res) => {
+router.delete("/scans/:username", async (req: DeleteUserScansRequest, res) => {
 
     const routeName = req.routeName();
 

@@ -3,7 +3,7 @@ import { uuidSchema } from "./uuid.js";
 import { type Request } from "express";
 
 /**
- * The schema for the request body of the POST /scan/:username endpoint.
+ * The schema for the request body of the `POST /scan/:username` endpoint.
  */
 export const scanBarcodeRequestBody = z.object({
     barcode: z.string().nonempty(),
@@ -11,19 +11,19 @@ export const scanBarcodeRequestBody = z.object({
 });
 
 /**
- * The type of request body of the POST /scan/:username endpoint.
+ * The type of request body of the `POST /scan/:username` endpoint.
  */
 type ScanBarcodeRequestBody = z.infer<typeof scanBarcodeRequestBody>;
 
 /**
- * The type of router parameters of the POST /scan/:username endpoint.
+ * The type of route parameters of the `POST /scan/:username` endpoint.
  */
 type ScanBarcodeRequestParams = {
     username: string;
 };
 
 /**
- * The type of the query of the POST /scan/:username endpoint.
+ * The type of the query of the `POST /scan/:username` endpoint.
  */
 type ScanBarcodeRequestQuery = {
     barcode?: string;
@@ -31,7 +31,7 @@ type ScanBarcodeRequestQuery = {
 };
 
 /**
- * The type of the request object for the POST /scan/:username endpoint.
+ * The type of the request object for the `POST /scan/:username` endpoint.
  */
 export interface ScanBarcodeRequest extends Request {
     body: ScanBarcodeRequestBody;
