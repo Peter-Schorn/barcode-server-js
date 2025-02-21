@@ -6,12 +6,16 @@ import { logger } from "../logging/loggers.js";
 import { errorToDebugString } from "../utils/errors.js";
 import { webSocketManager } from "../model/WebSocketManager.js";
 import {
-    type ScannedBarcodesResponse,
     type ScannedBarcodeResponse
 } from "../model/ScannedBarcodesResponse.js";
+
 import {
-    type DeletedScansNotification
-} from "../model/DeletedScansNotification.js";
+    SQLNotificationTypes
+} from "../model/SQLNotificationTypes.js";
+
+import {
+    type SQLNotificationPayload
+} from "../types/SQLNotificationPayload.js";
 
 // MARK: Documentation
 // https://github.com/vitaly-t/pg-promise/wiki/Robust-Listeners
@@ -39,10 +43,12 @@ function onNotification(notification: Notification): void {
     }
 
     try {
-        const json = JSON.parse(notification.payload);
+        const json = JSON.parse(
+            notification.payload
+        ) as SQLNotificationPayload;
 
         switch (json.type) {
-            case "insert": {
+            case SQLNotificationTypes.Insert: {
                 /*
                 [
                     {
@@ -65,7 +71,7 @@ function onNotification(notification: Notification): void {
                     }
                 ]
                 */
-                const data = json.data as ScannedBarcodesResponse;
+                const data = json.data;
 
                 /*
                 [
@@ -110,7 +116,7 @@ function onNotification(notification: Notification): void {
                 }
                 break;
             }
-            case "delete": {
+            case SQLNotificationTypes.Delete: {
                 /*
                 [
                     {
@@ -127,7 +133,7 @@ function onNotification(notification: Notification): void {
                     }
                 ]
                 */
-                const data = json.data as DeletedScansNotification;
+                const data = json.data;
 
                 /*
                 [
@@ -160,7 +166,8 @@ function onNotification(notification: Notification): void {
             }
             default: {
                 logger.error(
-                    `Listener: Unknown payload type: ${json.type}`
+                    "Listener: unexpected notification payload: " +
+                    `${notification.payload}`
                 );
             }
         }

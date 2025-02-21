@@ -7,4 +7,4 @@ export type DeletedScan = {
  * Represents the payload of the notification sent to the client when scans are
  * deleted from the database.
  */
-export type DeletedScansNotification = DeletedScan[];
+export type DeletedScans = DeletedScan[];

@@ -10,7 +10,8 @@ import {
     type DeleteScansRequest
 } from "../model/DeleteScansRequest.js";
 import {
-    scanBarcodeRequestBody
+    scanBarcodeRequestBody,
+    type ScanBarcodeRequest,
 } from "../model/ScanBarcodeRequest.js";
 import {
     type ScannedBarcodesResponse
@@ -110,7 +111,7 @@ router.get("/users", async (req, res) => {
 // Response: "user '<username>' scanned '<barcode>' (id: <id>)". A header with
 // the name 'Barcode-ID' will be included in the response with the value of the
 // barcode id.
-router.post("/scan/:username", async (req, res) => {
+router.post("/scan/:username", async (req: ScanBarcodeRequest, res) => {
 
     const routeName = req.routeName();
 
@@ -137,6 +138,8 @@ router.post("/scan/:username", async (req, res) => {
                 `${routeName}: error parsing request body: ` +
                 `${JSON.stringify(result.error.errors)}`
             );
+            // TODO: Send more user-friendly error message when parsing the
+            // TODO: request body fails.
             res.status(400).send(result.error.errors);
             return;
         }

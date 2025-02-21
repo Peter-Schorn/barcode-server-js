@@ -2,6 +2,7 @@
 import express from "express";
 
 express.request.routeName = function(): string {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     return `${this.method} ${this.route.path}`;
 };
 

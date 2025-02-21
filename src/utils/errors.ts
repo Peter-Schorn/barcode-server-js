@@ -49,6 +49,9 @@ export function errorToDebugString(error: unknown): string {
 
 
     for (const propertyName of propertyNames) {
+        // we know these properties exist on the object because they were
+        // returned by Object.getOwnPropertyNames
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         errorDetails[propertyName] = (error as any)[propertyName];
     }
 

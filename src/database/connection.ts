@@ -1,5 +1,6 @@
 import pgPromise from "pg-promise";
 import { sqlLogger } from "../logging/loggers.js";
+import { errorToDebugString } from "../utils/errors.js";
 
 const connectionURI = process.env.BARCODE_DROP_DATABASE_CONNECTION_URI;
 if (!connectionURI) {
@@ -21,7 +22,7 @@ export const pgp = pgPromise({
         sqlLogger.debug("disconnected from database");
     },
     error(err) {
-        sqlLogger.error(`database error: ${err.message}`);
+        sqlLogger.error(`database error: ${errorToDebugString(err)}`);
     }
 });
 
