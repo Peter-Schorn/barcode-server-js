@@ -1,7 +1,7 @@
 import { type IConnected, type ILostContext } from "pg-promise";
+import type { IClient } from "pg-promise/typescript/pg-subset.js";
 import { type Notification } from "pg";
 import { db } from "./connection.js";
-import { pgp } from "./connection.js";
 import { logger } from "../logging/loggers.js";
 import { errorToDebugString } from "../utils/errors.js";
 import { webSocketManager } from "../model/WebSocketManager.js";
@@ -21,8 +21,6 @@ import {
 // https://github.com/vitaly-t/pg-promise/wiki/Robust-Listeners
 
 // MARK: Listen for database notifications
-
-class IClient extends pgp.pg.Client { }
 
 /** the channel to listen on */
 const channel = "barcodes";
