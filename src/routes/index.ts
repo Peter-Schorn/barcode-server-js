@@ -26,6 +26,11 @@ import {
 
 const router = express.Router();
 
+router.get("/", (req, res) => {
+    res.contentType("text/plain");
+    res.send("success");
+});
+
 // MARK: GET /scans
 //
 // Retrieves all scanned barcodes from the database, sorted in descending order
