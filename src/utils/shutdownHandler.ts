@@ -4,8 +4,18 @@ import { db, pgp } from "../database/connection.js";
 import { PROCESS_UUID } from "../index.js";
 import { server } from "../index.js";
 
+/** Ensure we do not execute cleanup logic multiple times */
+let didInitiateShutdown = false;
+
 export function shutdownHandler(signal: NodeJS.Signals): void {
     logger.notice(`Received signal ${signal}. Cleaning up...`);
+
+    if (didInitiateShutdown) {
+        logger.notice("Shutdown already initiated. Ignoring signal.");
+        return;
+    }
+
+    didInitiateShutdown = true;
 
     new Promise<void>((resolve) => {
         server.close((error) => {

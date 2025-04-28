@@ -7,6 +7,8 @@ import router from "./routes/index.js";
 import wsRouter from "./routes/websocket.js";
 import cors from "cors";
 import "./database/listener.js";
+import path from "path";
+import { logger } from "./logging/loggers.js";
 
 // MARK: configure app
 const app = new WebSocketExpress();
@@ -14,6 +16,14 @@ const app = new WebSocketExpress();
 // MARK: configure CORS
 type CorsMiddleware = (options?: cors.CorsOptions) => express.RequestHandler;
 app.use((cors as CorsMiddleware)());
+
+// MARK: static files
+const publicPath = path.join(import.meta.dirname, "public");
+logger.notice(`publicPath: ${publicPath}`);
+
+app.use(express.static(publicPath, {
+    dotfiles: "allow"
+}));
 
 // https://github.com/expressjs/morgan?tab=readme-ov-file#dev
 app.use(morgan("dev"));  // TODO: do we need to use app.useHTTP instead?
