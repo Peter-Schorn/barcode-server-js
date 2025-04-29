@@ -396,6 +396,7 @@ router.delete("/scans", async (req: DeleteScansRequest, res) => {
 
     let sqlQuery = "DELETE FROM barcodes WHERE ";
     // at this point, at least one of ids or users is guaranteed to be non-empty
+    // and both cannot be empty
     if (ids.length > 0) {
         sqlQuery += "id IN (${ids:list}) ";
     }
