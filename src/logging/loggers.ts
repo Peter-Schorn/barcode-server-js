@@ -13,13 +13,11 @@ import { type Format } from "logform";
 //     debug: 7
 //   }
 
-
-const isProduction = process.env.NODE_ENV === "production";
-
 /** aws cloudwatch logs do not support terminal colors */
-const colorizeFormatIfProduction: Format[] = isProduction
-? []
-: [winston.format.colorize()];
+const colorizeFormatIfProduction: Format[] =
+    process.env.NODE_ENV === "production"
+        ? []
+        : [winston.format.colorize()];
 
 const logLevel = process.env.LOG_LEVEL ?? "info";
 

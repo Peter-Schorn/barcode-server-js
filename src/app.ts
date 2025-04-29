@@ -26,7 +26,8 @@ app.use(express.static(publicPath, {
 }));
 
 // https://github.com/expressjs/morgan?tab=readme-ov-file#dev
-app.use(morgan("dev"));  // TODO: do we need to use app.useHTTP instead?
+const morganFormat = process.env.NODE_ENV === "production" ? "short" : "dev";
+app.use(morgan(morganFormat));
 app.use(WebSocketExpress.json());
 app.use(WebSocketExpress.urlencoded({ extended: false }));
 
