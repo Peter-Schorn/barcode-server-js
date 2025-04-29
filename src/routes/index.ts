@@ -421,7 +421,6 @@ router.delete("/scans", async (req: DeleteScansRequest, res) => {
 
 });
 
-
 router.use(logErrorsMiddleware);
 router.use(mainErrorMiddleware);
 
