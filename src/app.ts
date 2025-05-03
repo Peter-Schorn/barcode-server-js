@@ -28,7 +28,7 @@ app.use(express.static(publicPath, {
 // https://github.com/expressjs/morgan?tab=readme-ov-file#dev
 const morganFormat = process.env.NODE_ENV === "production" ? "short" : "dev";
 app.use(morgan(morganFormat));
-app.use(WebSocketExpress.json());
+app.use(WebSocketExpress.json({strict: false}));
 app.use(WebSocketExpress.urlencoded({ extended: false }));
 
 // MARK: configure routes

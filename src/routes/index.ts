@@ -21,8 +21,7 @@ import { type GetScansResponse } from "../types/routes/GetScansResponse.js";
 import { type GetUsersResponse } from "../types/routes/GetUsersResponse.js";
 import {
     type DeleteUserScansRequest
- } from "../types/routes/DeleteUserScansRequest.js";
-
+} from "../types/routes/DeleteUserScansRequest.js";
 
 const router = express.Router();
 
@@ -126,19 +125,24 @@ router.post("/scan/:username", async (req: ScanBarcodeRequest, res) => {
 
     const routeName = req.routeName();
 
+    const contentType = req.get("Content-Type");
+    logger.debug(`${routeName}: Content-Type: ${contentType}`);
+
     const username = req.params.username;
 
     let barcode: string;
     let id: string | null | undefined | typeof SQLDefault;
 
     // parameters in query string
-    const barcodeQueryParam = req.getFirstQueryParamValue("barcode");
+    const barcodeQueryParam = req.getFirstQueryParamValue("barcode")
+        ?? req.getFirstQueryParamValue("text");
+
     if (barcodeQueryParam) {
         barcode = barcodeQueryParam;
         id = req.getFirstQueryParamValue("id");
     }
     // parameters in body
-    else if (req.body?.barcode) {
+    else if (req.body) {
         const result = scanBarcodeRequestBody.safeParse(req.body);
         if (result.success) {
             barcode = result.data.barcode;
@@ -149,14 +153,22 @@ router.post("/scan/:username", async (req: ScanBarcodeRequest, res) => {
                 `${routeName}: error parsing request body: ` +
                 `${JSON.stringify(result.error.errors)}`
             );
-            // TODO: Send more user-friendly error message when parsing the
-            // TODO: request body fails.
-            res.status(400).send(result.error.errors);
+            res.contentType("text/plain");
+            res.status(400).send(
+                result.error.errors[0]?.message ?? "an unknown error occurred"
+            );
             return;
         }
     }
     else {
-        res.status(400).send("missing parameter 'barcode'");
+        let errorMessage = "missing required field 'barcode' or 'text'";
+
+        if (!contentType) {
+            errorMessage += " (missing Content-Type header)";
+        }
+
+        res.contentType("text/plain");
+        res.status(400).send(errorMessage);
         return;
     }
 
@@ -169,6 +181,7 @@ router.post("/scan/:username", async (req: ScanBarcodeRequest, res) => {
 
     if (id) {
         if (!isValidUUIDv4(id)) {
+            res.contentType("text/plain");
             res.status(400).send("invalid v4 uuid");
             return;
         }
@@ -181,7 +194,8 @@ router.post("/scan/:username", async (req: ScanBarcodeRequest, res) => {
 
     const result: { id: string } = await db.one(
         "INSERT INTO barcodes(id, barcode, username) " +
-        "VALUES(${id}, ${barcode}, ${username}) RETURNING id",
+        "VALUES(${id}, ${barcode}, ${username}) " +
+        "RETURNING id",
         { id, barcode, username }
     );
 
@@ -228,6 +242,7 @@ router.delete("/all-scans/older", async (req, res) => {
     const secondsQueryParam = req.getFirstQueryParamValue("seconds");
     logger.debug(`${routeName}: secondsQueryParam: ${secondsQueryParam}`);
     if (!secondsQueryParam) {
+        res.contentType("text/plain");
         res.status(400).send("missing parameter 'seconds'");
         return;
     }
@@ -235,6 +250,7 @@ router.delete("/all-scans/older", async (req, res) => {
     const seconds = parseInt(secondsQueryParam);
     logger.debug(`${routeName}: seconds: ${seconds}`);
     if (isNaN(seconds)) {
+        res.contentType("text/plain");
         res.status(400).send("'seconds' must be an integer");
         return;
     }
@@ -276,6 +292,7 @@ router.delete("/scans/:username/older", async (req, res) => {
     const secondsQueryParam = req.getFirstQueryParamValue("seconds");
     logger.debug(`${routeName}: secondsQueryParam: ${secondsQueryParam}`);
     if (!secondsQueryParam) {
+        res.contentType("text/plain");
         res.status(400).send("missing parameter 'seconds'");
         return;
     }
@@ -283,6 +300,7 @@ router.delete("/scans/:username/older", async (req, res) => {
     const seconds = parseInt(secondsQueryParam);
     logger.debug(`${routeName}: seconds: ${seconds}`);
     if (isNaN(seconds)) {
+        res.contentType("text/plain");
         res.status(400).send("'seconds' must be an integer");
         return;
     }
@@ -360,6 +378,7 @@ router.delete("/scans", async (req: DeleteScansRequest, res) => {
     if (idsQueryParam || usersQueryParam) {
         ids = idsQueryParam?.split(",") ?? [];
         if (!ids.every(isValidUUIDv4)) {
+            res.contentType("text/plain");
             res.status(400).send("invalid v4 uuid");
             return;
         }
@@ -367,6 +386,7 @@ router.delete("/scans", async (req: DeleteScansRequest, res) => {
         users = usersQueryParam?.split(",") ?? [];
 
         if (ids.length === 0 && users.length === 0) {
+            res.contentType("text/plain");
             res.status(400).send(
                 "either 'ids' or 'users' must be provided as a non-empty array"
             );
@@ -383,7 +403,15 @@ router.delete("/scans", async (req: DeleteScansRequest, res) => {
             users = result.data.users ?? [];
         }
         else {
-            res.status(400).send(result.error.errors);
+            logger.error(
+                `${routeName}: error parsing request body: ` +
+                `${JSON.stringify(result.error.errors)}`
+            );
+
+            res.contentType("text/plain");
+            res.status(400).send(
+                result.error.errors[0]?.message ?? "an unknown error occurred"
+            );
             return;
         }
     }

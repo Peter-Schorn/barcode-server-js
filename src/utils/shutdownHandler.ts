@@ -8,12 +8,14 @@ import { server } from "../index.js";
 let didInitiateShutdown = false;
 
 export function shutdownHandler(signal: NodeJS.Signals): void {
-    logger.notice(`Received signal ${signal}. Cleaning up...`);
+    logger.notice(`Received signal ${signal}.`);
 
     if (didInitiateShutdown) {
         logger.notice("Shutdown already initiated. Ignoring signal.");
         return;
     }
+
+    logger.notice("Cleaning up...");
 
     didInitiateShutdown = true;
 
