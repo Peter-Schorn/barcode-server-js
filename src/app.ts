@@ -9,6 +9,8 @@ import cors from "cors";
 import "./database/listener.js";
 import path from "path";
 import { logger } from "./logging/loggers.js";
+import { logErrorsMiddleware } from "./middleware/logErrorsMiddleware.js";
+import { mainErrorMiddleware } from "./middleware/mainErrorMiddleware.js";
 
 // MARK: configure app
 const app = new WebSocketExpress();
@@ -29,10 +31,15 @@ app.use(express.static(publicPath, {
 const morganFormat = process.env.NODE_ENV === "production" ? "short" : "dev";
 app.use(morgan(morganFormat));
 app.use(WebSocketExpress.json({strict: false}));
+
 app.use(WebSocketExpress.urlencoded({ extended: false }));
 
 // MARK: configure routes
 app.use("/", router);
 app.use("/watch", wsRouter);
+
+// MARK: error handling
+app.use(logErrorsMiddleware);
+app.use(mainErrorMiddleware);
 
 export default app;

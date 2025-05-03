@@ -10,11 +10,19 @@ export function mainErrorMiddleware(
             err.code === "23505" &&
             err.constraint === "barcodes_pkey"
         ) {
+            res.contentType("text/plain");
             res.status(400).send(
                 "a barcode with this id already exists"
             );
             return;
         }
+    }
+
+    // Handle body parse errors
+    if (err instanceof SyntaxError) {
+        res.contentType("text/plain");
+        res.status(400).send(err.message);
+        return;
     }
 
     next(err);

@@ -3,8 +3,6 @@ import { db } from "../database/connection.js";
 import { logger } from "../logging/loggers.js";
 import { isValidUUIDv4 } from "../utils/uuid.js";
 import { SQLDefault } from "../database/types.js";
-import { logErrorsMiddleware } from "../middleware/logErrorsMiddleware.js";
-import { mainErrorMiddleware } from "../middleware/mainErrorMiddleware.js";
 import {
     deleteScansRequestBody,
     type DeleteScansRequest
@@ -448,8 +446,5 @@ router.delete("/scans", async (req: DeleteScansRequest, res) => {
     res.status(204).send();
 
 });
-
-router.use(logErrorsMiddleware);
-router.use(mainErrorMiddleware);
 
 export default router;
