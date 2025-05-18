@@ -100,8 +100,8 @@ class WebSocketManager {
                 `WebSocketManager: socket for user '${client.username}' ` +
                 `(id: ${client.id}) error: ${errorString}`
             );
-            // Shouldn't need to remove the client here, right?
-
+            // no need to remove the client here as the 'close' event will be
+            // triggered automatically after an error, and cleanup happens there
         });
 
 
@@ -133,7 +133,7 @@ class WebSocketManager {
     }
 
     /**
-     *  Sends a JSON message to all clients for a given user.
+     * Sends a JSON message to all clients for a given user.
      *
      * @param username the username of the user to send the message to
      * @param data the data to send to the user, which will be serialized to

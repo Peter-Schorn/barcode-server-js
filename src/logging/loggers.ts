@@ -14,7 +14,7 @@ import { type Format } from "logform";
 //   }
 
 /** aws cloudwatch logs do not support terminal colors */
-const colorizeFormatIfProduction: Format[] =
+const colorizeFormatIfDev: Format[] =
     process.env.NODE_ENV === "production"
         ? []
         : [winston.format.colorize()];
@@ -28,7 +28,7 @@ export const logger = winston.createLogger({
     levels: winston.config.syslog.levels,
     level: logLevel,
     format: winston.format.combine(
-        ...colorizeFormatIfProduction,
+        ...colorizeFormatIfDev,
         winston.format.simple(),
     ),
     transports: [
@@ -43,7 +43,7 @@ export const sqlLogger = winston.createLogger({
     levels: winston.config.syslog.levels,
     level: logLevel,
     format: winston.format.combine(
-        ...colorizeFormatIfProduction,
+        ...colorizeFormatIfDev,
         winston.format.label({ label: "SQL" }),
         winston.format.printf(info => {
             return `[${info.label}] ${info.level}: ${info.message}`;
